@@ -25,7 +25,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.smarthose.Icons.KitchenIcon
+import com.example.smarthose.navigation.BottomBarScreen
 import com.example.smarthose.ui.theme.BackgroundColor
 
 @Composable
@@ -252,7 +257,56 @@ fun ControlBlock(
         }
     }
 }
-sealed class ControlBlockItem(var title:String,var icon:Int){
-    object LightningBlock:ControlBlockItem("Room \nLightning", R.drawable.ceiling_lamp)
-    object DoorBlock:ControlBlockItem("Door \nControl", R.drawable.door_handle)
+
+@Composable
+fun BottomNav(navController: NavController) {
+    val items= listOf(
+        BottomBarScreen.Home,
+        BottomBarScreen.User
+    )
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination
+    BottomNavigation(
+        modifier = Modifier
+            .padding(12.dp, 0.dp, 12.dp, 0.dp)
+            .height(100.dp),
+        backgroundColor = Color.White,
+        elevation = 0.dp
+    ) {
+        items.forEach {
+            BottomNavigationItem(
+                icon = {
+                    it.icon?.let {
+                        Icon(
+                            imageVector = it,
+                            contentDescription = "",
+                            modifier = Modifier.size(35.dp),
+                            //tint = Color.Gray
+
+                        )
+                    }
+                },
+                selected = currentRoute?.hierarchy?.any { it.route == it.route } == true,
+                selectedContentColor = Color(R.color.purple_700),
+                unselectedContentColor = Color.White.copy(alpha = 0.4f),
+                onClick = {
+                    it.route?.let { it1 ->
+                        navController.navigate(it1) {
+                            // Pop up to the start destination of the graph to
+                            // avoid building up a large stack of destinations
+                            // on the back stack as users select items
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            launchSingleTop = true
+                            // Restore state when reselecting a previously selected item
+                            restoreState = true
+                        }
+                    }
+                }
+            )
+        }
+    }
 }

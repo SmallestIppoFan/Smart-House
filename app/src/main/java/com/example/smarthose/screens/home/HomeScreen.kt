@@ -10,11 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.smarthose.ControlBlock
-import com.example.smarthose.ControlBlockItem
 import com.example.smarthose.CustomChipGroup
 import com.example.smarthose.Icons.TemperatureIcon
 import com.example.smarthose.TemperatureBlock
 import com.example.smarthose.ui.theme.BackgroundColor
+import com.example.smarthose.ui.theme.ControlBlockItem
 
 @Composable
 fun HomeScreen() {

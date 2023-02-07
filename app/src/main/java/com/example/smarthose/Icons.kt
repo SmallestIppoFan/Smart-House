@@ -12,4 +12,6 @@ object Icons {
 
     const val LightningIcon=R.drawable.ceiling_lamp
 
+    const val MicrophoneIcon=R.drawable.microphone
+
 }
