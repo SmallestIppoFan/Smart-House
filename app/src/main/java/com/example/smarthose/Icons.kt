@@ -1,6 +1,5 @@
 package com.example.smarthose
 
-import androidx.compose.ui.res.painterResource
 
 object Icons {
     const val TemperatureIcon= R.drawable.temperature

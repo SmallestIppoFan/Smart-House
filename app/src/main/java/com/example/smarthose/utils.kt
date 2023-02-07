@@ -22,15 +22,11 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smarthose.Icons.BathRoomIcon
 import com.example.smarthose.Icons.KitchenIcon
-import com.example.smarthose.Icons.LightningIcon
 import com.example.smarthose.ui.theme.BackgroundColor
-import com.example.smarthose.ui.theme.Shapes
 
 @Composable
 fun TopBar(
