@@ -43,7 +43,6 @@ fun MainScreen(navController: NavHostController = rememberNavController()) {
                 .clip(RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
             Color.White,
             cutoutShape = CircleShape,
-            //backgroundColor = Color.White,
             elevation = 22.dp
         ) {
             BottomNav(navController = navController)

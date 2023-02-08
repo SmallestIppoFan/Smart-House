@@ -29,7 +29,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.smarthose.Icons.BathRoomIcon
+import com.example.smarthose.Icons.BedroomIcon
+import com.example.smarthose.Icons.GuestRoomIcon
 import com.example.smarthose.Icons.KitchenIcon
+import com.example.smarthose.Icons.LivingRoomIcon
+import com.example.smarthose.Icons.OutsideHouseIcon
 import com.example.smarthose.navigation.BottomBarScreen
 import com.example.smarthose.ui.theme.BackgroundColor
 
@@ -109,7 +114,7 @@ fun CustomChipGroup( ) {
                                     "Kitchen selected",
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                "Living-room" -> Toast.makeText(
+                                "Living room" -> Toast.makeText(
                                     context,
                                     "Living-room selected",
                                     Toast.LENGTH_SHORT
@@ -124,12 +129,12 @@ fun CustomChipGroup( ) {
                 }
             }
         }
-        ImageOfTheRoom(title = "")
+        ImageOfTheRoom(roomImage = selected)
     }
 }
 
 @Composable
-fun ImageOfTheRoom(title:String) {
+fun ImageOfTheRoom(roomImage:String) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -137,7 +142,14 @@ fun ImageOfTheRoom(title:String) {
         color=Color.Transparent
     ) {
         Row(horizontalArrangement = Arrangement.Center) {
-            Image(painter = painterResource(id = KitchenIcon), contentDescription = "")
+            when(roomImage){
+                "Bedroom" -> Image(painter = painterResource(id = BedroomIcon), contentDescription ="Image of the bedroom")
+                "Bathroom"-> Image(painter = painterResource(id = BathRoomIcon), contentDescription ="Image of the bathroom" )
+                "Kitchen"-> Image(painter = painterResource(id = KitchenIcon), contentDescription ="Image of the Kitchen")
+                "Living room"-> Image(painter = painterResource(id = LivingRoomIcon), contentDescription ="Image of the Living room" )
+                "Guest room"-> Image(painter = painterResource(id = GuestRoomIcon), contentDescription ="Image of the Guest Room" )
+                else-> Image(painter = painterResource(id = OutsideHouseIcon), contentDescription ="Outside" )
+            }
         }
     }
 
@@ -227,7 +239,8 @@ fun TemperatureBlock(
 @Composable
 fun ControlBlock(
     icon:Int,
-    text:String
+    text:String,
+    selected:MutableState<Boolean>
     ) {
     Card(modifier = Modifier
         .height(180.dp)
@@ -246,12 +259,14 @@ fun ControlBlock(
                     contentDescription = "Icon of the service"
                 )
                 Spacer(modifier = Modifier.width(50.dp))
-                Switch(checked = false, onCheckedChange = {})
+                Switch(checked = selected.value, onCheckedChange = {
+                    selected.value=it
+                })
             }
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             Text(
                 text = "$text",
-                fontSize=13.sp,
+                fontSize=16.sp,
                 fontWeight = FontWeight.Bold
                 )
         }
@@ -287,22 +302,16 @@ fun BottomNav(navController: NavController) {
                     }
                 },
                 selected = currentRoute?.hierarchy?.any { it.route == it.route } == true,
-                selectedContentColor = Color(R.color.purple_700),
-                unselectedContentColor = Color.White.copy(alpha = 0.4f),
+               // selectedContentColor = Color.Black,
+                unselectedContentColor = Color.White,
                 onClick = {
                     it.route?.let { it1 ->
                         navController.navigate(it1) {
-                            // Pop up to the start destination of the graph to
-                            // avoid building up a large stack of destinations
-                            // on the back stack as users select items
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
-                            // Avoid multiple copies of the same destination when
-                            // reselecting the same item
                             launchSingleTop = true
-                            // Restore state when reselecting a previously selected item
-                            restoreState = true
+                            restoreState=false
                         }
                     }
                 }
