@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "110372849767",
+    "firebase_url": "https://diplomka-561d0-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "diplomka-561d0",
+    "storage_bucket": "diplomka-561d0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110372849767:android:8519c93d58791ebd776cc2",
+        "android_client_info": {
+          "package_name": "com.example.smarthose"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "110372849767-odskjrfs1ki5tm55dkcghrjmr2mnqvvm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXY6LNJI8CSf7Rk9hcU6JV7EW0A6l9iNU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "110372849767-odskjrfs1ki5tm55dkcghrjmr2mnqvvm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

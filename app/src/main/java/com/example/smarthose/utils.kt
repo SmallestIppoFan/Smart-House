@@ -4,11 +4,14 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -22,6 +25,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +42,14 @@ import com.example.smarthose.Icons.LivingRoomIcon
 import com.example.smarthose.Icons.OutsideHouseIcon
 import com.example.smarthose.navigation.BottomBarScreen
 import com.example.smarthose.ui.theme.BackgroundColor
+import com.example.smarthose.ui.theme.GreyDark
+import com.example.smarthose.ui.theme.GreyLight
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.charset.Charset
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 @Composable
 fun TopBar(
@@ -73,18 +86,15 @@ fun TopBar(
 }
 
 @Composable
-fun CustomChipGroup( ) {
+fun CustomChipGroup( selected: MutableState<String>) {
     val context= LocalContext.current
     val chipList: List<String> = listOf(
         "Bedroom",
         "Bathroom",
         "Kitchen",
-        "Living room",
+        "Living_room",
         "Guest room"
     )
-    var selected by remember{
-        mutableStateOf("")
-    }
     Column(modifier = Modifier.padding(start = 15.dp)) {
         LazyRow(
             modifier = Modifier
@@ -95,9 +105,9 @@ fun CustomChipGroup( ) {
                 chipList.forEach { it ->
                     Chip(
                         title = it,
-                        selected = selected,
+                        selected = selected.value,
                         onSelected = {
-                            selected = it
+                            selected.value = it
                             when (it) {
                                 "Bedroom" -> Toast.makeText(
                                     context,
@@ -129,7 +139,7 @@ fun CustomChipGroup( ) {
                 }
             }
         }
-        ImageOfTheRoom(roomImage = selected)
+        ImageOfTheRoom(roomImage = selected.value)
     }
 }
 
@@ -197,18 +207,20 @@ fun Chip(
         }
     }
 }
+
 @Composable
 fun TemperatureBlock(
     temperature:String,
     roomName:String,
     backgroundColor:Color,
-    icon:Painter
+    icon:Painter,
+    type:String
 ) {
     Card(
         modifier = Modifier
             .background(backgroundColor)
             .fillMaxWidth()
-            .height(110.dp)
+            .height(90.dp)
             .padding(start = 15.dp, end = 15.dp, top = 0.dp),
         shape = RoundedCornerShape(20.dp),
         elevation = 3.dp
@@ -217,16 +229,18 @@ fun TemperatureBlock(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier.padding(start = 10.dp)
             ) {
-            Image(painter = icon, contentDescription = "Icon of the temperature")
+            Image(painter = icon, contentDescription = "Icon of the temperature",
+                modifier = Modifier.size(50.dp)
+                )
             Column(modifier = Modifier.padding(start = 10.dp)) {
                 Text(
-                    text = "$temperature °C ",
+                    text = "$temperature",
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     color = Color.Black
                     )
                 Text(
-                    text = "Temperature in $roomName",
+                    text = "$type in $roomName",
                     fontSize = 15.sp,
                     color = Color.Gray
                 )
@@ -240,18 +254,19 @@ fun TemperatureBlock(
 fun ControlBlock(
     icon:Int,
     text:String,
-    selected:MutableState<Boolean>
+    selected:MutableState<Boolean>,
+    controller: () ->Unit
     ) {
     Card(modifier = Modifier
-        .height(180.dp)
-        .width(180.dp)
+        .height(160.dp)
+        .width(170.dp)
         .padding(4.dp),
         shape = RoundedCornerShape(20.dp),
         elevation = 3.dp
     ) {
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(start = 20.dp, top = 20.dp)) {
+            .padding(start = 20.dp, top = 20.dp,end=10.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Icon(
                     painter = painterResource(id = icon),
@@ -261,6 +276,7 @@ fun ControlBlock(
                 Spacer(modifier = Modifier.width(50.dp))
                 Switch(checked = selected.value, onCheckedChange = {
                     selected.value=it
+                    controller()
                 })
             }
             Spacer(modifier = Modifier.height(40.dp))
@@ -319,3 +335,79 @@ fun BottomNav(navController: NavController) {
         }
     }
 }
+
+@Composable
+fun OtpTextField(
+    modifier: Modifier = Modifier,
+    otpText: String,
+    otpCount: Int = 6,
+    onOtpTextChange: (String, Boolean) -> Unit,
+) {
+    BasicTextField(
+        modifier = modifier,
+        value = otpText,
+        onValueChange = {
+            if (it.length <= otpCount) {
+                onOtpTextChange.invoke(it, it.length == otpCount)
+
+            }
+        },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+        decorationBox = {
+            Row(horizontalArrangement = Arrangement.Center) {
+                repeat(otpCount) { index ->
+                    CharView(
+                        index = index,
+                        text = otpText
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun CharView(
+    index: Int,
+    text: String
+) {
+    val isFocused = text.length == index
+    val char = when {
+        index == text.length -> "0"
+        index > text.length -> ""
+        else -> text[index].toString()
+    }
+    Text(
+        modifier = Modifier
+            .width(40.dp)
+            .border(
+                1.dp, when {
+                    isFocused -> GreyDark
+                    else -> GreyLight
+                }, RoundedCornerShape(8.dp)
+            )
+            .padding(2.dp),
+        text = char,
+        style = MaterialTheme.typography.h4,
+        color = if (isFocused) {
+            GreyLight
+        } else {
+            GreyDark
+        },
+        textAlign = TextAlign.Center
+    )
+}
+
+
+
+
+fun decryptAES(input: ByteArray, key: ByteArray): Float {
+    val cipher = Cipher.getInstance("AES/ECB/NoPadding")
+    val secretKey = SecretKeySpec(key, "AES")
+    cipher.init(Cipher.DECRYPT_MODE, secretKey)
+    val decryptedBytes = cipher.doFinal(input)
+    return ByteBuffer.wrap(decryptedBytes).order(ByteOrder.LITTLE_ENDIAN).float
+}
+
+

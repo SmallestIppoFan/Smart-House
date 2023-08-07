@@ -5,7 +5,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.smarthose.screens.auth.Login
-import com.example.smarthose.screens.auth.SignUp
 
 fun NavGraphBuilder.authNavGraph(navController: NavController){
     navigation(
@@ -15,21 +14,14 @@ fun NavGraphBuilder.authNavGraph(navController: NavController){
         composable(route = AuthScreen.Login.route){
             Login(
                 onClick = {
-                    navController.popBackStack()
-                    navController.navigate(Graph.HOME)
+                    navController.navigate(Graph.HOME){
+                        popUpTo(0)
+                    }
                 },
-                onSignUp = {
-                    navController.navigate(AuthScreen.SignUp.route)
-                }
+                navController=navController
             )
         }
-        composable(route = AuthScreen.SignUp.route){
-            SignUp(onClick = {
-                navController.navigate(AuthScreen.Login.route)
-            })
-        }
     }
-
 }
 sealed class AuthScreen(val route:String){
     object Login:AuthScreen(route = "LOGIN")
